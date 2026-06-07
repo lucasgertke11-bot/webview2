@@ -62,11 +62,13 @@ Section "Import Registry"
     DetailPrint "Registry imported!"
   ${EndIf}
 
-  DetailPrint "Setting up x64 CLSID..."
-  ; Use sysnative to bypass WOW64 file system redirector and access 64-bit reg.exe
-  nsExec::ExecToLog '"$WINDIR\sysnative\reg.exe" add "HKLM\Software\Classes\CLSID\{daa52b27-8897-50af-ada5-c6c71bb64e17}" /ve /d "Embedded Browser WebView" /f'
-  nsExec::ExecToLog '"$WINDIR\sysnative\reg.exe" add "HKLM\Software\Classes\CLSID\{daa52b27-8897-50af-ada5-c6c71bb64e17}\InprocServer32" /ve /d "${PF86}\Microsoft\EdgeWebView\Application\149.0.4022.52\EBWebView\x64\EmbeddedBrowserWebView.dll" /f'
-  nsExec::ExecToLog '"$WINDIR\sysnative\reg.exe" add "HKLM\Software\Classes\CLSID\{daa52b27-8897-50af-ada5-c6c71bb64e17}\InprocServer32" /v ThreadingModel /d "Apartment" /f'
+  DetailPrint "Setting up x64 CLSID (64-bit view)..."
+  ; Read WINEPREFIX to bypass WOW64 redirector via Z: drive direct path
+  ReadEnvStr $0 "WINEPREFIX"
+  StrCpy $1 "Z:\$0\drive_c\windows\system32\reg.exe"
+  nsExec::ExecToLog '"$1" add "HKLM\Software\Classes\CLSID\{daa52b27-8897-50af-ada5-c6c71bb64e17}" /ve /d "Embedded Browser WebView" /f'
+  nsExec::ExecToLog '"$1" add "HKLM\Software\Classes\CLSID\{daa52b27-8897-50af-ada5-c6c71bb64e17}\InprocServer32" /ve /d "C:\Program Files (x86)\Microsoft\EdgeWebView\Application\149.0.4022.52\EBWebView\x64\EmbeddedBrowserWebView.dll" /f'
+  nsExec::ExecToLog '"$1" add "HKLM\Software\Classes\CLSID\{daa52b27-8897-50af-ada5-c6c71bb64e17}\InprocServer32" /v ThreadingModel /d "Apartment" /f'
   DetailPrint "x64 CLSID registered!"
 SectionEnd
 
